@@ -1,0 +1,9 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+build-and-push-image:
+  script:
+    - echo "This job runs in merge request pipelines"
+    - echo "When pipelines are enabled, this job will build and push the image"
+
