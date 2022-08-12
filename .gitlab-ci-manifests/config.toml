@@ -1,0 +1,13 @@
+concurrent = 4
+check_interval = 30
+  [[runners]]
+    name = "gitlab-runner"
+    url = "gitlab.consulting.redhat.com"
+    executor = "kubernetes"
+    [runners.kubernetes]
+      [runners.kubernetes.pod_security_context]
+        run_as_non_root = false
+        run_as_user = 0
+      [runners.kubernetes.service_container_security_context]
+        run_as_non_root = false
+        run_as_user = 0

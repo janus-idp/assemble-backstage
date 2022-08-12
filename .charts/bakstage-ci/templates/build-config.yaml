@@ -1,0 +1,24 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "{{ include "backstage-ci.fullname" . }}"
+  labels:
+    {{- include "backstage-ci.labels" . | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: DockerImage
+      name: 'quay.io/{{ .Values.image.org }}/{{ .Values.image.name }}:{{ .Values.image.commit_sha }}'
+    pushSecret:
+      name: 'quay-push-secret'    
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: DockerImage
+        name: 'docker.io/node:16-bullseye-slim'
+  source:
+    type: Git
+    git:
+      uri: 'https://gitlab.consulting.redhat.com/redhat-cop/assemble/assemble-backstage'
+  runPolicy: Serial
