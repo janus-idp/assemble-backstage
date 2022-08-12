@@ -1,9 +1,23 @@
+stages:
+  - build
+
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
-build-and-push-image:
-  script:
-    - echo "This job runs in merge request pipelines"
-    - echo "When pipelines are enabled, this job will build and push the image"
+image: quay.io/buildah/stable
 
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+before_script:
+  - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+build-and-push-image:
+  tags: 
+  - backstage
+  stage: build
+  script:
+    - buildah bud -t $IMAGE_TAG .
+    - buildah push $IMAGE_TAG
+  when: manual
