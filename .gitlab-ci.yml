@@ -5,7 +5,7 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
 
-image: quay.io/buildah/stable
+
 
 # before_script:
 #   - buildah login -u "$QUAY_USER" -p "$QUAY_PASSWORD" quay.io
@@ -20,20 +20,24 @@ build-and-push-image:
   tags: 
   - backstage
   stage: build
-  # script:
-  #   - buildah bud -t quay.io/assemble/backstage:latest .
-  #   - buildah push quay.io/assemble/backstage:latest
-  # when: manual
-
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
   script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"${REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${QUAY_USER}" "${QUAY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-    - >-
-      /kaniko/executor
-      --context "${CI_PROJECT_DIR}"
-      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"      
+    - echo "{\"auths\":{\"${REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${QUAY_USER}" "${QUAY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > ./config.json
+    #- buildah login -u "${$QUAY_USER}" -p "${QUAY_PASSWORD}" quay.io
+    - buildah bud -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - buildah push --auth ./config.json ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  when: manual
+  image: 
+    name: quay.io/buildah/stable
+
+  # image:
+  #   name: gcr.io/kaniko-project/executor:debug
+  #   entrypoint: [""]
+  # script:
+  #   - mkdir -p /kaniko/.docker
+  #   - echo "{\"auths\":{\"${REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${QUAY_USER}" "${QUAY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  #   - >-
+  #     /kaniko/executor
+  #     --context "${CI_PROJECT_DIR}"
+  #     --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+  #     --destination "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"      
       
