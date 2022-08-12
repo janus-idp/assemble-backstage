@@ -3,7 +3,7 @@ stages:
 
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'push'
 
 image: quay.io/buildah/stable
 
