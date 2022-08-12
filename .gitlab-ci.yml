@@ -25,9 +25,8 @@ build-and-push-image:
     #- buildah login -u "${$QUAY_USER}" -p "${QUAY_PASSWORD}" quay.io
     - buildah bud -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
     - buildah push --auth ./config.json ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
-  when: manual
   image: 
-    name: quay.io/buildah/stable
+    name: registry.redhat.io/rhel8/buildah:8.6
 
   # image:
   #   name: gcr.io/kaniko-project/executor:debug
