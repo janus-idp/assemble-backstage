@@ -21,4 +21,6 @@ spec:
     type: Git
     git:
       uri: 'https://gitlab.consulting.redhat.com/redhat-cop/assemble/assemble-backstage'
+    sourceSecret:
+      name: "{{ include "backstage-ci.fullname" . }}-repo-auth"
   runPolicy: Serial
