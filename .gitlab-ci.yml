@@ -34,7 +34,7 @@ build-and-push-image:
       ./.helm/linux-amd64/helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token ${SA_TOKEN} \
       upgrade backstage-ci ./.charts/backstage-ci -i -n ${NAMESPACE} --set image.org=${IMAGE_ORG} --set image.name=${IMAGE_NAME} --set image.commit_sha=${CI_COMMIT_SHORT_SHA} --set quay.username=${QUAY_USER} \
       --set quay.username=${QUAY_PASSWORD}
-  - oc start-build backstage-ci -F -n ${NAMESPACE}-build  
+  - oc --token ${SA_TOKEN} start-build backstage-ci -F -n ${NAMESPACE}-build  
 
 
   # script:
