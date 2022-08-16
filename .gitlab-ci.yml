@@ -19,7 +19,7 @@ variables:
   IMAGE_ORG: assemble
   IMAGE_NAME: backstage
   IMAGE_FULL_NAME: $REGISTRY/$IMAGE_ORG/$IMAGE_NAME
-  GITLAB_JWT: $CI_JOB_JWT
+  GITLAB_JWT: $CI_JOB_TOKEN
 
 build-and-push-image:
   tags: 
