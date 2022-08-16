@@ -12,8 +12,7 @@ spec:
     pushSecret:
       name: 'quay-push-secret'    
   strategy:
-    type: Source
-    sourceStrategy:
+    dockerStrategy:
       from:
         kind: DockerImage
         name: 'docker.io/node:16-bullseye-slim'
