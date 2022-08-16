@@ -10,3 +10,6 @@ image:
 quay:
   username: dummy
   token: dummy
+
+gitlab:
+  token: dummy  
