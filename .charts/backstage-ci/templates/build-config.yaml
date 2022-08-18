@@ -5,6 +5,10 @@ metadata:
   labels:
     {{- include "backstage-ci.labels" . | nindent 4 }}
 spec:
+  resources:
+    requests: 
+      cpu: "1500m"
+      memory: "4Gi"
   output:
     to:
       kind: DockerImage
