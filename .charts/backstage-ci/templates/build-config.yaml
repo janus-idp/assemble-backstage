@@ -7,11 +7,11 @@ metadata:
 spec:
   resources:
     requests: 
-      cpu: "1500m"
-      memory: "4Gi"
+      cpu: "1000m"
+      memory: "2Gi"
     limits: 
-      cpu: "1500m"
-      memory: "4Gi"      
+      cpu: "1000m"
+      memory: "2Gi"      
   output:
     to:
       kind: DockerImage
