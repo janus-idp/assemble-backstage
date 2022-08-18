@@ -9,6 +9,9 @@ spec:
     requests: 
       cpu: "1500m"
       memory: "4Gi"
+    limits: 
+      cpu: "1500m"
+      memory: "4Gi"      
   output:
     to:
       kind: DockerImage
