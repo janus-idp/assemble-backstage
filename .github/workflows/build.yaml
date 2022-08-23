@@ -1,0 +1,36 @@
+name: push
+on: 
+  push:
+    branches:
+      - master
+      - main
+    tags:        
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV          
+    - name: checkout code
+      uses: actions/checkout@v2
+    - name: Docker Login
+      uses: docker/login-action@v1.12.0
+      with:
+        registry: 'quay.io'
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+
+    - name: Build container image and push
+      uses: docker/build-push-action@v2.7.0
+      with:
+        context: .
+        file: ./${{ env.PROJECT_DIR }}/Dockerfile
+        push: true
+        tags: |
+          ghcr.io/assemble/backstage:${{ github.sha }}
+          ghcr.io/assemble/backstage:latest
+          ghcr.io/assemble/backstage:${{ github.ref_name }}          
