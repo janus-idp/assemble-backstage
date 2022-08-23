@@ -31,6 +31,6 @@ jobs:
         file: ./${{ env.PROJECT_DIR }}/Dockerfile
         push: true
         tags: |
-          ghcr.io/assemble/backstage:${{ github.sha }}
-          ghcr.io/assemble/backstage:latest
-          ghcr.io/assemble/backstage:${{ github.ref_name }}          
+          quay.io/assemble/backstage:${{ github.sha }}
+          quay.io/assemble/backstage:latest
+          quay.io/assemble/backstage:${{ github.ref_name }}          
