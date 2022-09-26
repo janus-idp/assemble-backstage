@@ -53,5 +53,9 @@ RUN tar xzf bundle.tar.gz && rm bundle.tar.gz
 
 # Copy any other files that we need at runtime
 COPY app-config.yaml ./
+COPY catalog-info.yaml ./
+ADD ./examples /examples
+
+RUN chmod -R 775 /app 
 
 CMD ["node", "packages/backend", "--config", "app-config.yaml"]
