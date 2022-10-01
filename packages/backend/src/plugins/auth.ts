@@ -17,6 +17,19 @@ export default async function createPlugin(
     tokenManager: env.tokenManager,
     providerFactories: {
       ...defaultAuthProviderFactories,
+      oauth2Proxy: providers.oauth2Proxy.create({
+        signIn: {
+          async resolver({ result }, ctx) {
+            const name = result.getHeader('x-forwarded-user');
+            if (!name) {
+              throw new Error('Request did not contain a user')
+            }
+            return ctx.signInWithCatalogUser({
+              entityRef: { name },
+            });
+          },
+        },
+      }),
 
       // This replaces the default GitHub auth provider with a customized one.
       // The `signIn` option enables sign-in for this provider, using the
@@ -35,6 +48,7 @@ export default async function createPlugin(
       // your own, see the auth documentation for more details:
       //
       //   https://backstage.io/docs/auth/identity-resolver
+
       github: providers.github.create({
         signIn: {
           resolver(_, ctx) {
