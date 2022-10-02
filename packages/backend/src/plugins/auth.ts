@@ -3,6 +3,11 @@ import {
   providers,
   defaultAuthProviderFactories,
 } from '@backstage/plugin-auth-backend';
+import {
+  DEFAULT_NAMESPACE,
+  stringifyEntityRef,
+} from '@backstage/catalog-model';
+
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 
@@ -20,12 +25,20 @@ export default async function createPlugin(
       oauth2Proxy: providers.oauth2Proxy.create({
         signIn: {
           async resolver({ result }, ctx) {
-            const name = result.getHeader('x-forwarded-user');
+            const name = result.getHeader('x-forwarded-preferred-username');
             if (!name) {
               throw new Error('Request did not contain a user')
             }
-            return ctx.signInWithCatalogUser({
-              entityRef: { name },
+            const userEntityRef = stringifyEntityRef({
+              kind: 'User',
+              name: name,
+              namespace: DEFAULT_NAMESPACE,
+            });
+            return ctx.issueToken({
+              claims: {
+                sub: userEntityRef,
+                ent: [userEntityRef],
+              },
             });
           },
         },
