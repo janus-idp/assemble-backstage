@@ -27,12 +27,43 @@ import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
 
-import { AlertDisplay, OAuthRequestDialog } from '@backstage/core-components';
+import { AlertDisplay, OAuthRequestDialog, UserIdentity } from '@backstage/core-components';
 import { createApp } from '@backstage/app-defaults';
-import { FlatRoutes } from '@backstage/core-app-api';
+import { FlatRoutes, SignInPageProps } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { PermissionedRoute } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
+import { ProxiedSignInPage } from '@backstage/core-components';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
+
+const DummySignInComponent: any = (props: SignInPageProps) => {
+  const [error, setError] = React.useState<string | undefined>();
+  const config = useApi(configApiRef);
+  React.useEffect(() => {
+    
+      fetch(`${window.location.origin}/oauth2/userinfo`)
+        .then(data => data.json())
+        .then(data => {
+          props.onSignInSuccess(
+            UserIdentity.fromLegacy({
+              userId: data.email,
+              profile: {
+                email: data.email,
+                displayName: data.preferredUsername,
+                picture: ''
+              },
+            }),
+          );
+        })
+        .catch(err => {
+          setError(err.message);
+        });
+  }, [config]);
+  if (error) {
+    return <div>{error}</div>;
+  }
+  return <div />;
+};
 
 const app = createApp({
   apis,
@@ -50,6 +81,10 @@ const app = createApp({
     bind(orgPlugin.externalRoutes, {
       catalogIndex: catalogPlugin.routes.catalogIndex,
     });
+  },
+  components: {
+    // SignInPage: props => <ProxiedSignInPage {...props} provider="oauth2Proxy" />,
+    SignInPage: DummySignInComponent,
   },
 });
 

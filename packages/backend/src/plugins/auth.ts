@@ -2,7 +2,13 @@ import {
   createRouter,
   providers,
   defaultAuthProviderFactories,
+  OAuthRefreshRequest,
+  OAuthResponse,
 } from '@backstage/plugin-auth-backend';
+import {
+  DEFAULT_NAMESPACE,
+  stringifyEntityRef,
+} from '@backstage/catalog-model';
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 
@@ -17,7 +23,27 @@ export default async function createPlugin(
     tokenManager: env.tokenManager,
     providerFactories: {
       ...defaultAuthProviderFactories,
-
+      oauth2Proxy: providers.oauth2Proxy.create({
+        signIn: {
+          async resolver({ result }, ctx) {
+            const name = result.getHeader('x-forwarded-preferred-username');
+            if (!name) {
+              throw new Error('Request did not contain a user')
+            }
+            const userEntityRef = stringifyEntityRef({
+              kind: 'User',
+              name: name,
+              namespace: DEFAULT_NAMESPACE,
+            });
+            return ctx.issueToken({
+              claims: {
+                sub: userEntityRef,
+                ent: [userEntityRef],
+              },
+            });
+          },
+        },
+      }),
       // This replaces the default GitHub auth provider with a customized one.
       // The `signIn` option enables sign-in for this provider, using the
       // identity resolution logic that's provided in the `resolver` callback.
