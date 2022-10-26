@@ -4,7 +4,6 @@ on:
     branches:
       - master
       - main
-      - enable-backstage-catalog-item-discovery
     tags:        
       - v*
 
