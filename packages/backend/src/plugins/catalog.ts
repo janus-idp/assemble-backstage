@@ -13,7 +13,10 @@ export default async function createPlugin(
   builder.addEntityProvider(
      GithubEntityProvider.fromConfig(env.config, {
        logger: env.logger,
-       scheduler: env.scheduler,
+       schedule: env.scheduler.createScheduledTaskRunner({
+         frequency: { minutes: 30 },
+         timeout: { minutes: 3 },
+       })
      }),
    );
   const { processingEngine, router } = await builder.build();
