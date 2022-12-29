@@ -33,6 +33,7 @@
     "@backstage/plugin-search-backend-module-pg": "^0.3.5",
     "@backstage/plugin-search-backend-node": "^1.0.0",
     "@backstage/plugin-techdocs-backend": "^1.2.0",
+    "@janus-idp/backstage-plugin-keycloak-backend": "^1.0.2",
     "app": "link:../app",
     "dockerode": "^3.3.1",
     "express": "^4.17.1",

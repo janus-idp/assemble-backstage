@@ -3,13 +3,15 @@ import {
   providers,
   defaultAuthProviderFactories,
 } from '@backstage/plugin-auth-backend';
+
 import {
   DEFAULT_NAMESPACE,
   stringifyEntityRef,
 } from '@backstage/catalog-model';
 
+import { NotFoundError } from '@backstage/errors';
 import { Router } from 'express';
-import { PluginEnvironment } from '../types';
+import { PluginEnvironment,  } from '../types';
 
 export default async function createPlugin(
   env: PluginEnvironment,
@@ -29,17 +31,29 @@ export default async function createPlugin(
             if (!name) {
               throw new Error('Request did not contain a user')
             }
-            const userEntityRef = stringifyEntityRef({
-              kind: 'User',
-              name: name,
-              namespace: DEFAULT_NAMESPACE,
-            });
-            return ctx.issueToken({
-              claims: {
-                sub: userEntityRef,
-                ent: [userEntityRef],
-              },
-            });
+
+            try {
+
+              // Attempts to sign in existing user
+              const signedInUser = await ctx.signInWithCatalogUser({
+                entityRef: { name },
+              });
+
+              return Promise.resolve(signedInUser);
+            } catch (e) {
+                // Create stub user
+                const userEntityRef = stringifyEntityRef({
+                  kind: 'User',
+                  name: name,
+                  namespace: DEFAULT_NAMESPACE,
+                });
+                return ctx.issueToken({
+                  claims: {
+                    sub: userEntityRef,
+                    ent: [userEntityRef],
+                  },
+                });
+            }
           },
         },
       }),

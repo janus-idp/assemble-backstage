@@ -3,6 +3,7 @@ import { ScaffolderEntitiesProcessor } from '@backstage/plugin-scaffolder-backen
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 import { GithubEntityProvider } from '@backstage/plugin-catalog-backend-module-github';
+import { KeycloakOrgEntityProvider } from '@janus-idp/backstage-plugin-keycloak-backend';
 
 
 export default async function createPlugin(
@@ -11,14 +12,25 @@ export default async function createPlugin(
   const builder = await CatalogBuilder.create(env);
   builder.addProcessor(new ScaffolderEntitiesProcessor());
   builder.addEntityProvider(
-     GithubEntityProvider.fromConfig(env.config, {
-       logger: env.logger,
-       schedule: env.scheduler.createScheduledTaskRunner({
-         frequency: { minutes: 30 },
-         timeout: { minutes: 3 },
-       })
-     }),
-   );
+    GithubEntityProvider.fromConfig(env.config, {
+      logger: env.logger,
+      schedule: env.scheduler.createScheduledTaskRunner({
+        frequency: { minutes: 30 },
+        timeout: { minutes: 3 },
+      })
+    }),
+  );
+  builder.addEntityProvider(
+    KeycloakOrgEntityProvider.fromConfig(env.config, {
+      id: 'development',
+      logger: env.logger,
+      schedule: env.scheduler.createScheduledTaskRunner({
+        frequency: { hours: 1 },
+        timeout: { minutes: 50 },
+        initialDelay: { seconds: 15 }
+      }),
+    }),
+  );
   const { processingEngine, router } = await builder.build();
   await processingEngine.start();
   return router;
